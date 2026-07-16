@@ -4,6 +4,7 @@
 #include "student.h"
 #include "consts.h"
 #include "offering.h"
+#include "admin.h"
 
 int studentLogin(){
     char username[ID_LEN];
@@ -52,7 +53,40 @@ int studentLogin(){
     }
 }
 
-void offeringListStudent(Student student){
+void enrollCourse(Student student, int semester, int pos){
+
+    FILE* file = fopen("offerings.json", "rb");
+    Offering current;
+    int num = 1, input, found = 0;
+    printf("Enter number of offering: ");
+    scanf("%d", &input);
+    while(fread(&current, sizeof(Offering), 1, file)){
+        if (semester == current.semester){
+            if (num == input){
+                printOfferingStudent(current, num);
+                found = 1;
+                break;
+            }
+            num++;
+        }
+    }
+    if (found == 0) {
+        printf("Offering not found.");
+        getchar();
+        getchar();
+        return;
+    }
+    if (calender[1] == 0) {
+        printf("unit selection is disabled");
+        return;
+    }
+    if (current.capacity <= current.enrollments) {printf("Capasity is full"); return;}
+    //if (passed_prerequisities(student, current.course) == 0) {printf"You have not passed the prerequisities.");return;}
+    Enrolled_offering new_offering = {current, -1, -1};
+    student.reports[student.num_offering++] = new_offering;
+}
+
+void offeringListStudent(Student student, int pos){
     int semester, option, num = 0;
     printf("Enter semester number: ");
     scanf("%d", &semester);
@@ -65,12 +99,25 @@ void offeringListStudent(Student student){
         num++;
         if (current.semester == semester) printOfferingStudent(current, num);
     }
+    fclose(file);
     printf("1. Search\n2. Enroll in course\n");
     printf("3. Withdraw course\n4. Go back\n");
     printf("Enter an option:  ");
     scanf("%d", &option);
+    switch(option){
+        case 1:
+            //searchOffering();
+            break;
+        case 2:
+            enrollCourse(student, semester, pos);
+            break;
+        case 3:
+            //withdrawCourse(student);
+            break;
+        case 4:
+            return;
+    }
 }
-
 
 void studentDashboard(int pos){
     FILE* file = fopen("students.json", "rb");
@@ -88,13 +135,13 @@ void studentDashboard(int pos){
         scanf("%d", &option);
         switch(option){
             case 1:
-                //offeringListStudent(student);
+                offeringListStudent(student, pos);
                 break;
             case 2:
                 //coursesListGeneral();
                 break;
             case 3:
-                //reportCardStudent(student);
+                //reportCardStudent(student, pos);
                 break;
             case 4:
                 return;

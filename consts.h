@@ -19,4 +19,5 @@
 #define MAX_PREREQUISITES 10
 #define PLACE_LEN 50
 
+
 #endif // CONSTS_H

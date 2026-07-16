@@ -29,5 +29,7 @@ typedef struct{
 
 int studentLogin();
 void studentDashboard(int pos);
+void enrollCourse(Student student, int semester, int pos);
+void offeringListStudent(Student student, int pos);
 
 #endif // STUDENT_H
