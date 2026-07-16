@@ -14,7 +14,7 @@ void adminLogin(){
         printf("Enter your username: ");
         scanf("%s", username);
         if (strcmp(username, ADMIN_USERNAME)) {
-            printf("Username not found.");
+            printf("Username wrong.");
             getchar();
             getchar();
         }
@@ -32,6 +32,7 @@ void adminLogin(){
             getchar();
         } else break;
     }
+
 }
 
 int authentication(Student stu){
@@ -51,8 +52,9 @@ int authentication(Student stu){
         printf("Enter an option: ");
 
         int option;
-        scanf("%d", option);
-        if (option == 2) return -1;
+        scanf("%d", &option);
+        if (option == 1) continue;
+        if (option == 2) return -2;
     }
 
     while(1){
@@ -68,8 +70,9 @@ int authentication(Student stu){
         printf("Enter an option: ");
 
         int option;
-        scanf("%d", option);
-        if (option == 2) return -1;
+        scanf("%d", &option);
+        if (option == 1) continue;
+        if (option == 2) return -2;
     }
 
     while(1){
@@ -86,35 +89,75 @@ int authentication(Student stu){
         printf("Enter an option: ");
 
         int option;
-        scanf("%d", option);
-        if (option == 2) return -1;
+        scanf("%d", &option);
+        if (option == 1) continue;
+        if (option == 2) return -2;
     }
     return 1;
 }
 
 void forgotPassword(){
+    int pos, auth = 0;
     while(1){
         system("cls");
 
         printf("Enter your username: ");
         char username[ID_LEN];
         scanf("%s", username);
-
         Student current;
-        int pos = 0, found = 0;
+        pos = 0;
         FILE* studentFile = fopen("students.json", "rb+");
         while (fread(&current, sizeof(Student), 1, studentFile)){
             if (strcmp(current.student_id, username) == 0){
-                if (authentication(current) == -1) return;
+                auth = authentication(current);
+                break;
+            }
+            pos++;
+        }
+        fclose(studentFile);
+        if (auth == -2) return;
+        if (auth == 0){
+            printf("User not found.\n");
+            printf("1. Retry\n");
+            printf("2. Go to login menu\n");
+            printf("Enter an option: ");
+            int input;
+            scanf("%d", &input);
+            if (input == 1) continue;
+            if (input == 2) return;
+        }
+        else if (auth == 1){
+            while(1){
+                char new_password[PASSWORD_LEN];
+                char confirm[PASSWORD_LEN];
+                printf("Enter your new password: ");
+                scanf("%s", new_password);
+                printf("Confirm your password: ");
+                scanf("%s", confirm);
+                if (strcmp(new_password, confirm) == 0){
+                    Student current;
+                    FILE* file = fopen("students.json", "rb+");
+                    strcpy(current.password, new_password);
+                    fseek(file, pos * sizeof(Student), SEEK_SET);
+                    fwrite(&current, sizeof(Student), 1, file);
+                    fclose(file);
+                    printf("Password changed successfully.\n");
+                    printf("Press any key to go to login menu...\n");
+                    getchar();
+                    getchar();
+                    return;
+                }
+                else {
+                    int opt;
+                    printf("Passwords do not match.\n");
+                    printf("1. Retry.\n2. Cancel (go to login menu).\n");
+                    printf("Enter an option: ");
+                    scanf("%d", &opt);
+                    if (opt == 1) continue;
+                    if (opt == 2) return;
+                }
             }
         }
-        printf("User not found.\n");
-        printf("1. Retry\n");
-        printf("2. Go to login menu\n");
-        printf("Enter an option: ");
-        int input;
-        scanf("%d", &input);
-        if (input==2) return;
     }
 }
 
@@ -130,10 +173,12 @@ void loginPage(){
         printf("5. Exit\n");
         printf("Enter an option: ");
         scanf("%d", &input);
-
+        int pos;
         switch(input){
             case 1:
-                //studentLogin();
+                pos = studentLogin();
+                if (pos == -1) continue;
+                studentDashboard(pos);
                 break;
             case 2:
                 //facultyLogin();
@@ -147,7 +192,7 @@ void loginPage(){
             case 5:
                 exit(0);
             default:
-                printf("Invalid number!");
+                printf("Invalid number. ");
                 getchar();
                 getchar();
         }
