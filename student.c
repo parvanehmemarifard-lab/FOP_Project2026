@@ -54,11 +54,21 @@ int studentLogin(){
 }
 
 int passedPrerequisities(Student student, Course course){
-
+    int found;
+    for (int i = 0; i < course.num_prequisites; i++){
+        found = 0;
+        for (int j = 0; j < student.num_offering; j++){
+            if (strcmp(course.prerequisites[i], student.reports[j].offering.course.course_id) == 0){
+                found = 1;
+                break;
+            }
+        }
+        if (found == 0) return 0;
+    }
+    return 1;
 }
 
 void enrollCourse(Student student, int semester, int pos){
-
     FILE* file = fopen("offerings.json", "rb");
     Offering current;
     int num = 1, input, found = 0;
@@ -85,7 +95,10 @@ void enrollCourse(Student student, int semester, int pos){
         return;
     }
     if (current.capacity <= current.enrollments) {printf("Capasity is full"); return;}
-    if (passedPrerequisities(student, current.course) == 0) {printf("You have not passed the prerequisities."); return;}
+    if (passedPrerequisities(student, current.course) == 0){
+        printf("You have not passed the prerequisities.");
+        return;
+    }
     Enrolled_offering new_offering = {current, -1, -1};
     student.reports[student.num_offering++] = new_offering;
 }
@@ -123,6 +136,67 @@ void offeringListStudent(Student student, int pos){
     }
 }
 
+float calculateGPA(Student student){
+    float sum = 0;
+    int units = 0;
+    for (int i = 0; i < student.num_offering; i++){
+        sum += student.reports[i].grade * student.reports[i].offering.course.units;
+        units += student.reports[i].offering.course.units;
+    }
+    return sum/units;
+}
+
+void reportCardStudent(Student student){
+    int gpa = calculateGPA(student);
+    while(1){
+        printf("|student id    |%20s |\n", student.student_id);
+        printf("|first name    |%20s |\n", student.first_name);
+        printf("|last name     |%20s |\n", student.last_name);
+        printf("|national code |%20s |\n", student.national_code);
+        printf("|field         |%20s |\n", student.field);
+        printf("|entrance year |%20s |\n", student.entrance_year);
+        printf("|section       |%20s |\n", student.section);
+        printf("|mentor        |%20s |\n", student.mentor);
+        printf("|department    |%20s |\n", student.department);
+        printf("|GPA           |%20d |\n", gpa);
+        int opt;
+        printf("1. Go to semester\n2. Go back\nEnter an option: ");
+        scanf("%d", &opt);
+        if (opt == 1){
+                system("cls");
+            int enrolled = 0, passed = 0, units = 0;
+            float sum = 0;
+            int semester;
+            printf("Enter semester number: ");
+            scanf("%d", &semester);
+            printf("Report card -%s %s- %d", student.first_name, student.last_name, semester);
+            printf("| course name | course id | units | grade | passed | instructor's name |\n");
+            printf("|-------------|-----------|-------|-------|--------|-------------------|\n");
+            for (int i = 0; i < student.num_offering; i++){
+                if (student.reports[i].offering.semester == semester){
+                    printf("| %s | %s | %d | %d | %s | %s %s |\n",
+                    student.reports[i].offering.course.course_name,
+                    student.reports[i].offering.course.course_id,
+                    student.reports[i].offering.course.units, student.reports[i].grade,
+                    (student.reports[i].grade >= 10 ? "Yes" : "No"),
+                    student.reports[i].offering.faculty.first_name,
+                    student.reports[i].offering.faculty.last_name);
+                    enrolled++;
+                    sum += student.reports[i].offering.course.units * student.reports[i].grade;
+                    units += student.reports[i].offering.course.units;
+                    if (student.reports[i].grade >= 10) passed++;
+                }
+            }
+            printf("Enrolled courses: %d\n", enrolled);
+            printf("Passed courses: %d\n", passed);
+            printf("Failed courses: %d", enrolled - passed);
+            printf("GPA: %.2f", sum/units);
+            printf("Press any key to go back...");
+            return;
+        } else return;
+    }
+}
+
 void studentDashboard(int pos){
     FILE* file = fopen("students.json", "rb");
     fseek(file, pos * sizeof(Student), SEEK_SET);
@@ -145,7 +219,7 @@ void studentDashboard(int pos){
                 coursesListGeneral();
                 break;
             case 3:
-                //reportCardStudent(student, pos);
+                reportCardStudent(student);
                 break;
             case 4:
                 return;

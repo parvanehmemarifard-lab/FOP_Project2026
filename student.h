@@ -5,7 +5,7 @@
 
 typedef struct{
 	Offering offering;
-	int grade;
+	float grade;
     int score;
 } Enrolled_offering;
 
@@ -28,8 +28,11 @@ typedef struct{
 } Student;
 
 int studentLogin();
+int passedPrerequisities(Student student, Course course);
 void studentDashboard(int pos);
 void enrollCourse(Student student, int semester, int pos);
+float calculateGPA(Student student);
+void reportCardStudent(Student student);
 void offeringListStudent(Student student, int pos);
 
 #endif // STUDENT_H
