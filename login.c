@@ -3,6 +3,102 @@
 #include <string.h>
 #include "consts.h"
 #include "student.h"
+#include "faculty.h"
+#include "admin.h"
+
+int facultyLogin(){
+    char username[ID_LEN];
+    FILE* file = fopen("faculty.json", "rb");
+    Faculty current;
+    int pos = 0;
+    while (1){
+            system("cls");
+        printf("Enter your username: ");
+        scanf("%s", username);
+
+        int found = 0;
+        rewind(file);
+        while (fread(&current, sizeof(Faculty), 1, file)){
+            if (strcmp(current.faculty_id, username) == 0){
+                found = 1;
+                break;
+            }
+            pos++;
+        }
+        if (found == 0){
+            int opt;
+            printf("Username not found.\n1. Retry\n2. Go back to main menu\n");
+            printf("Enter an option: ");
+            scanf("%d", &opt);
+            if (opt == 1) continue;
+            if (opt == 2) {fclose(file); return -1;}
+        } else break;
+    }
+
+    fclose(file);
+    char password[PASSWORD_LEN];
+    //system("cls");
+    //printf("Enter your username: %s\n", username);
+    printf("Enter your password: ");
+    scanf("%s", password);
+    if (strcmp(current.password, password) == 0){
+        printf("Login successful.");
+        return pos;
+    } else {
+        printf("Incorrect password.\n");
+        printf("Press any key to go back to main menu.");
+        getchar();
+        getchar();
+        return -1;
+    }
+}
+
+int studentLogin(){
+    char username[ID_LEN];
+    FILE* file = fopen("students.json", "rb");
+    Student current;
+    int pos = 0;
+    while (1){
+            system("cls");
+        printf("Enter your username: ");
+        scanf("%s", username);
+
+        int found = 0;
+        rewind(file);
+        while (fread(&current, sizeof(Student), 1, file)){
+            if (strcmp(current.student_id, username) == 0){
+                found = 1;
+                break;
+            }
+            pos++;
+        }
+        if (found == 0){
+            int opt;
+            printf("Username not found.\n1. Retry\n2. Go back to main menu\n");
+            printf("Enter an option: ");
+            scanf("%d", &opt);
+            if (opt == 1) continue;
+            if (opt == 2) {fclose(file); return -1;}
+        } else break;
+    }
+
+    fclose(file);
+    char password[PASSWORD_LEN];
+    //system("cls");
+    //printf("Enter your username: %s\n", username);
+    printf("Enter your password: ");
+    scanf("%s", password);
+    if (strcmp(current.password, password) == 0){
+        printf("Login successful.");
+        return pos;
+    } else {
+        printf("Incorrect password.\n");
+        printf("Press any key to go back to main menu.");
+        getchar();
+        getchar();
+        return -1;
+    }
+}
 
 void adminLogin(){
     const char ADMIN_USERNAME[] = "admin";
@@ -32,7 +128,7 @@ void adminLogin(){
             getchar();
         } else break;
     }
-
+    adminDashboard();
 }
 
 int authentication(Student stu){

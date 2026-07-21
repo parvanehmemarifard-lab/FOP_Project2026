@@ -6,53 +6,6 @@
 #include "offering.h"
 #include "admin.h"
 
-int studentLogin(){
-    char username[ID_LEN];
-    FILE* file = fopen("students.json", "rb");
-    Student current;
-    int pos = 0;
-    while (1){
-            system("cls");
-        printf("Enter your username: ");
-        scanf("%s", username);
-
-        int found = 0;
-        rewind(file);
-        while (fread(&current, sizeof(Student), 1, file)){
-            if (strcmp(current.student_id, username) == 0){
-                found = 1;
-                break;
-            }
-            pos++;
-        }
-        if (found == 0){
-            int opt;
-            printf("Username not found.\n1. Retry\n2. Go back to main menu\n");
-            printf("Enter an option: ");
-            scanf("%d", &opt);
-            if (opt == 1) continue;
-            if (opt == 2) {fclose(file); return -1;}
-        } else break;
-    }
-
-    fclose(file);
-    char password[PASSWORD_LEN];
-    //system("cls");
-    //printf("Enter your username: %s\n", username);
-    printf("Enter your password: ");
-    scanf("%s", password);
-    if (strcmp(current.password, password) == 0){
-        printf("Login successful.");
-        return pos;
-    } else {
-        printf("Incorrect password.\n");
-        printf("Press any key to go back to main menu.");
-        getchar();
-        getchar();
-        return -1;
-    }
-}
-
 int passedPrerequisities(Student student, Course course){
     int found;
     for (int i = 0; i < course.num_prequisites; i++){
@@ -227,3 +180,10 @@ void studentDashboard(int pos){
     }
 }
 
+void printStudent(Student current){
+    printf("|%s |%s |%s | %s |%s |%s | %s| %s| %s| %s| %s|\n",
+    current.first_name, current.last_name, current.student_id,
+    current.national_code, current.field, current.entrance_year,
+    current.section, current.mentor, current.department,
+    current.answer1, current.answer2, current.answer3);
+}

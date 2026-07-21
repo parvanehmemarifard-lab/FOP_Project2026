@@ -16,5 +16,8 @@ typedef struct{
 void printCourse(Course current);
 void searchCourse();
 void coursesListGeneral();
+void coursesListAdmin();
+void addCourse();
+void removeCourse();
 
 #endif // COURSE_H

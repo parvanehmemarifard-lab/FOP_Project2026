@@ -27,12 +27,12 @@ typedef struct{
     char password[PASSWORD_LEN + 1];
 } Student;
 
-int studentLogin();
 int passedPrerequisities(Student student, Course course);
 void studentDashboard(int pos);
 void enrollCourse(Student student, int semester, int pos);
 float calculateGPA(Student student);
 void reportCardStudent(Student student);
 void offeringListStudent(Student student, int pos);
+void printStudent(Student current);
 
 #endif // STUDENT_H
