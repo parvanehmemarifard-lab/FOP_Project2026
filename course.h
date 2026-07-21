@@ -13,6 +13,8 @@ typedef struct{
     char department[DEPARTMENT_LEN];
 } Course;
 
-
+void printCourse(Course current);
+void searchCourse();
+void coursesListGeneral();
 
 #endif // COURSE_H

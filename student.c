@@ -53,6 +53,10 @@ int studentLogin(){
     }
 }
 
+int passedPrerequisities(Student student, Course course){
+
+}
+
 void enrollCourse(Student student, int semester, int pos){
 
     FILE* file = fopen("offerings.json", "rb");
@@ -81,7 +85,7 @@ void enrollCourse(Student student, int semester, int pos){
         return;
     }
     if (current.capacity <= current.enrollments) {printf("Capasity is full"); return;}
-    //if (passed_prerequisities(student, current.course) == 0) {printf"You have not passed the prerequisities.");return;}
+    if (passedPrerequisities(student, current.course) == 0) {printf("You have not passed the prerequisities."); return;}
     Enrolled_offering new_offering = {current, -1, -1};
     student.reports[student.num_offering++] = new_offering;
 }
@@ -138,7 +142,7 @@ void studentDashboard(int pos){
                 offeringListStudent(student, pos);
                 break;
             case 2:
-                //coursesListGeneral();
+                coursesListGeneral();
                 break;
             case 3:
                 //reportCardStudent(student, pos);
