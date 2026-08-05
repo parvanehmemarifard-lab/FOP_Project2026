@@ -53,6 +53,7 @@ void searchCourse(){
     getchar();
 }
 
+
 void coursesListGeneral(){
 
     FILE* file = fopen("courses.json", "rb");
@@ -73,6 +74,41 @@ void coursesListGeneral(){
     }
     fclose(file);
 }
+
+void coursesListAdmin(){
+    FILE* file = fopen("courses.json", "rb");
+    Course current;
+    int opt;
+    while(1){
+        system("cls");
+        rewind(file);
+
+        printf("List of courses\n| course name | course id | units | prerequisites |");
+        printf(" section | field | department |\n|-------------|-----------|-------|");
+        printf("---------------|---------|-------|------------|\n");
+
+        while(fread(&current, sizeof(Course), 1, file)) printCourse(current);
+        printf("1. Search\n2. Add a course\n");
+        printf("3. Remove a course\n4. Go back\n");
+        printf("Enter an option: ");
+        scanf("%d", &opt);
+        switch(opt){
+            case 1:
+                searchCourse();
+                break;
+            case 2:
+                addCourse();
+                break;
+            case 3:
+                removeCourse();
+                break;
+            case 4:
+                return;
+        }
+    }
+    fclose(file);
+}
+
 
 void addCourse(){
     system("cls");
@@ -173,38 +209,4 @@ void removeCourse(){
     getchar();
     getchar();
     return;
-}
-
-void coursesListAdmin(){
-    FILE* file = fopen("courses.json", "rb");
-    Course current;
-    int opt;
-    while(1){
-        system("cls");
-        rewind(file);
-
-        printf("List of courses\n| course name | course id | units | prerequisites |");
-        printf(" section | field | department |\n|-------------|-----------|-------|");
-        printf("---------------|---------|-------|------------|\n");
-
-        while(fread(&current, sizeof(Course), 1, file)) printCourse(current);
-        printf("1. Search\n2. Add a course\n");
-        printf("3. Remove a course\n4. Go back\n");
-        printf("Enter an option: ");
-        scanf("%d", &opt);
-        switch(opt){
-            case 1:
-                searchCourse();
-                break;
-            case 2:
-                addCourse();
-                break;
-            case 3:
-                removeCourse();
-                break;
-            case 4:
-                return;
-        }
-    }
-    fclose(file);
 }
