@@ -23,6 +23,4 @@ void removeStudentFromOffering(Offering offering);
 
 void recordGrades(Offering offering);
 
-
-
 #endif // OFFERING_H

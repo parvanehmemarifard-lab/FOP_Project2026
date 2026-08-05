@@ -61,6 +61,8 @@ void searchOffering(int semester){
     getchar();
 }
 
+
+
 void addStudentToOffering(Offering offering){
     char id[ID_LEN];
     int pos = 0, found = 0;
@@ -150,6 +152,8 @@ void removeStudentFromOffering(Offering offering){
     }
 }
 
+
+
 void recordGrades(Offering offering){
     char filename[100];
     printf("Enter file name: ");
@@ -202,4 +206,3 @@ void recordGrades(Offering offering){
     getchar();
     getchar();
 }
-
