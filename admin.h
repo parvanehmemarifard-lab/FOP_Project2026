@@ -14,11 +14,13 @@ extern Request* requests[100];
 extern int request_count;
 
 void adminDashboard();
+
 void adminCalender();
-void adminFaculty();
 void adminStudents();
-void adminRequests();
+void adminFaculty();
 void adminOfferings();
+
+void adminRequests();
 int addNewOffering(Offering offering);
 int removeOffering(Offering offering);
 int increaseCapacity(Offering Offering, int new_capacity);

@@ -11,6 +11,43 @@ int calender[4] = {0, 0, 0, 0};
 Request* requests[100];
 int request_count = 0;
 
+
+void adminDashboard(){
+    int opt;
+    while(1){
+            system("cls");
+        printf("Welcome admin\n");
+        printf("1. Calender\n2. Students\n");
+        printf("3. Faculty members\n4. Requests\n");
+        printf("5. Offering\n6. Courses\n");
+        printf("7. Log out\nEnter an option: ");
+        scanf("%d", &opt);
+        switch(opt){
+            case 1:
+                adminCalender();
+                break;
+            case 2:
+                adminStudents();
+                break;
+            case 3:
+                adminFaculty();
+                break;
+            case 4:
+                adminRequests();
+                break;
+            case 5:
+                adminOfferings();
+                break;
+            case 6:
+                 coursesListAdmin();
+                 break;
+            case 7:
+                return;
+        }
+    }
+}
+
+
 void adminCalender(){
     int opt;
     while(1){
@@ -100,6 +137,60 @@ void adminFaculty(){
         }
     }
 }
+
+void adminOfferings(){
+    system("cls");
+    FILE* file = fopen("offerings.json", "rb");
+    Offering current;
+    int semester;
+    printf("Enter semester number: ");
+    scanf("%d", &semester);
+    while(1){
+        system("cls");
+        printf("Enter semester number: %d\n", semester);
+        rewind(file);
+        int opt, num = 0;
+
+        printf("List of offerings - %d\n", semester);
+        printf("| number | course name | course id | faculty id | semester");
+        printf(" | capacity | no. enrollments | department | place |\n");
+        printf("|--------|-------------|-----------|------------|----------|");
+        printf("----------|-----------------|------------|-------|\n");
+
+        while(fread(&current, sizeof(Offering), 1, file)){
+            if (current.semester == semester) printOfferingAdmin(current, ++num);
+        }
+
+        printf("1. Search\n");
+        printf("2. Add student to an offering\n");
+        printf("3. Remove student from an offering\n");
+        printf("4. Go back\n");
+        printf("Enter an option: ");
+        scanf("%d", &opt);
+
+        if (opt == 1) searchOffering(semester);
+        else if (opt == 4) {fclose(file); return;}
+        else {
+            int input, found = 0;
+            num = 1;
+            printf("Enter number of offering: ");
+            scanf("%d", &input);
+            rewind(file);
+            while(fread(&current, sizeof(Offering), 1, file)){
+                if (current.semester == semester){
+                    if (num == input) {found = 1; break;}
+                    num++;
+                }
+            }
+
+            if (found == 0) {printf("Offering not found."); getchar(); getchar();}
+            else if (opt == 2) addStudentToOffering(current);
+            else removeStudentFromOffering(current);
+        }
+    }
+}
+
+
 
 int addNewOffering(Offering offering){
     FILE* file = fopen("offerings.json", "ab");
@@ -225,92 +316,3 @@ void adminRequests(){
         }
     }
 }
-
-void adminOfferings(){
-    system("cls");
-    FILE* file = fopen("offerings.json", "rb");
-    Offering current;
-    int semester;
-    printf("Enter semester number: ");
-    scanf("%d", &semester);
-    while(1){
-        system("cls");
-        printf("Enter semester number: %d\n", semester);
-        rewind(file);
-        int opt, num = 0;
-
-        printf("List of offerings - %d\n", semester);
-        printf("| number | course name | course id | faculty id | semester");
-        printf(" | capacity | no. enrollments | department | place |\n");
-        printf("|--------|-------------|-----------|------------|----------|");
-        printf("----------|-----------------|------------|-------|\n");
-
-        while(fread(&current, sizeof(Offering), 1, file)){
-            if (current.semester == semester) printOfferingAdmin(current, ++num);
-        }
-
-        printf("1. Search\n");
-        printf("2. Add student to an offering\n");
-        printf("3. Remove student from an offering\n");
-        printf("4. Go back\n");
-        printf("Enter an option: ");
-        scanf("%d", &opt);
-
-        if (opt == 1) searchOffering(semester);
-        else if (opt == 4) {fclose(file); return;}
-        else {
-            int input, found = 0;
-            num = 1;
-            printf("Enter number of offering: ");
-            scanf("%d", &input);
-            rewind(file);
-            while(fread(&current, sizeof(Offering), 1, file)){
-                if (current.semester == semester){
-                    if (num == input) {found = 1; break;}
-                    num++;
-                }
-            }
-
-            if (found == 0) {printf("Offering not found."); getchar(); getchar();}
-            else if (opt == 2) addStudentToOffering(current);
-            else removeStudentFromOffering(current);
-        }
-    }
-}
-
-void adminDashboard(){
-    int opt;
-    while(1){
-            system("cls");
-        printf("Welcome admin\n");
-        printf("1. Calender\n2. Students\n");
-        printf("3. Faculty members\n4. Requests\n");
-        printf("5. Offering\n6. Courses\n");
-        printf("7. Log out\nEnter an option: ");
-        scanf("%d", &opt);
-        switch(opt){
-            case 1:
-                adminCalender();
-                break;
-            case 2:
-                adminStudents();
-                break;
-            case 3:
-                adminFaculty();
-                break;
-            case 4:
-                adminRequests();
-                break;
-            case 5:
-                adminOfferings();
-                break;
-            case 6:
-                 coursesListAdmin();
-                 break;
-            case 7:
-                return;
-        }
-    }
-}
-
-
