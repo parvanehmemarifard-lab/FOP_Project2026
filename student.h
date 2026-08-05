@@ -28,15 +28,15 @@ typedef struct{
 } Student;
 
 int passedPrerequisities(Student student, Course course);
-void printStudent(Student current);
 float calculateGPA(Student student);
 
-void enrollCourse(Student *student, int semester, int pos);
-
 void studentDashboard(int pos);
-void reportCardStudent(Student student);
 void offeringListStudent(Student student, int pos);
+void enrollCourse(Student *student, int semester, int pos);
+void withdrawCourse(Student *student, int semester, int pos);
+void reportCardStudent(Student student);
 
+void printStudent(Student current);
 void studentsList();
 void studentsSearch(FILE* file);
 void registerStudent();

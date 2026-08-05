@@ -21,6 +21,52 @@ int passedPrerequisities(Student student, Course course){
     return 1;
 }
 
+float calculateGPA(Student student){
+    if (student.num_offering == 0) return 0.0;
+    int found = 0;
+    float sum = 0;
+    int units = 0;
+    for (int i = 0; i < student.num_offering; i++){
+        if (student.reports[i].grade == -1) continue;
+        found = 1;
+        sum += student.reports[i].grade * student.reports[i].offering.course.units;
+        units += student.reports[i].offering.course.units;
+    }
+    if (found == 0) return 0.0;
+    return sum/units;
+}
+
+
+
+void studentDashboard(int pos){
+    FILE* file = fopen("students.json", "rb");
+    fseek(file, pos * sizeof(Student), SEEK_SET);
+    Student student;
+    fread(&student, sizeof(student), 1, file);
+    fclose(file);
+
+    int option;
+    while(1){
+            system("cls");
+        printf("1. Offerings\n2. Courses\n");
+        printf("3. Report card\n4. Log out\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+        switch(option){
+            case 1:
+                offeringListStudent(student, pos);
+                break;
+            case 2:
+                coursesListGeneral();
+                break;
+            case 3:
+                reportCardStudent(student);
+                break;
+            case 4:
+                return;
+        }
+    }
+}
 
 void enrollCourse(Student *student, int semester, int pos){
     FILE* fileOfferigs = fopen("offerings.json", "rb+");
@@ -170,7 +216,9 @@ void offeringListStudent(Student student, int pos){
         printf("capacity | no.enrollments | department | place |\n");
 
         while(fread(&current, sizeof(Offering), 1, file)){
-            if (current.semester == semester) printOfferingStudent(current, ++num);
+            if (current.semester == semester &&
+                passedPrerequisities(student, current.course))
+                    printOfferingStudent(current, ++num);
         }
         fclose(file);
         printf("1. Search\n2. Enroll in course\n");
@@ -193,23 +241,6 @@ void offeringListStudent(Student student, int pos){
     }
     fclose(file);
 }
-
-
-float calculateGPA(Student student){
-    if (student.num_offering == 0) return 0.0;
-    int found = 0;
-    float sum = 0;
-    int units = 0;
-    for (int i = 0; i < student.num_offering; i++){
-        if (student.reports[i].grade == -1) continue;
-        found = 1;
-        sum += student.reports[i].grade * student.reports[i].offering.course.units;
-        units += student.reports[i].offering.course.units;
-    }
-    if (found == 0) return 0.0;
-    return sum/units;
-}
-
 
 void reportCardStudent(Student student){
     int gpa = calculateGPA(student);
@@ -274,36 +305,6 @@ void reportCardStudent(Student student){
 }
 
 
-void studentDashboard(int pos){
-    FILE* file = fopen("students.json", "rb");
-    fseek(file, pos * sizeof(Student), SEEK_SET);
-    Student student;
-    fread(&student, sizeof(student), 1, file);
-    fclose(file);
-
-    int option;
-    while(1){
-            system("cls");
-        printf("1. Offerings\n2. Courses\n");
-        printf("3. Report card\n4. Log out\n");
-        printf("Enter an option: ");
-        scanf("%d", &option);
-        switch(option){
-            case 1:
-                offeringListStudent(student, pos);
-                break;
-            case 2:
-                coursesListGeneral();
-                break;
-            case 3:
-                reportCardStudent(student);
-                break;
-            case 4:
-                return;
-        }
-    }
-}
-
 
 void printStudent(Student current){
     printf("| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s |\n",
@@ -312,7 +313,6 @@ void printStudent(Student current){
     current.section, current.mentor, current.department,
     current.answer1, current.answer2, current.answer3);
 }
-
 
 void studentsSearch(FILE* file){
     int opt;
@@ -371,7 +371,6 @@ void studentsSearch(FILE* file){
     return;
 }
 
-
 void studentsList(){
     int opt;
     FILE* file = fopen("students.json", "rb");
@@ -395,7 +394,6 @@ void studentsList(){
     }
     fclose(file);
 }
-
 
 void registerStudent(){
     system("cls");
@@ -466,7 +464,6 @@ void registerStudent(){
     }
     fclose(file);
 }
-
 
 void removeStudent(){
     system("cls");
