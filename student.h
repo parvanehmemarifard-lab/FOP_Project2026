@@ -28,11 +28,18 @@ typedef struct{
 } Student;
 
 int passedPrerequisities(Student student, Course course);
-void studentDashboard(int pos);
-void enrollCourse(Student student, int semester, int pos);
+void printStudent(Student current);
 float calculateGPA(Student student);
+
+void enrollCourse(Student *student, int semester, int pos);
+
+void studentDashboard(int pos);
 void reportCardStudent(Student student);
 void offeringListStudent(Student student, int pos);
-void printStudent(Student current);
+
+void studentsList();
+void studentsSearch(FILE* file);
+void registerStudent();
+void removeStudent();
 
 #endif // STUDENT_H
