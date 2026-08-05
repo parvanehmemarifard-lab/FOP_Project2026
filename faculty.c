@@ -43,7 +43,6 @@ void facultyDashboard(int pos){
     }
 }
 
-
 void offerCourse(Faculty faculty){
     FILE* file = fopen("courses.json", "rb");
     Course current;
@@ -90,190 +89,6 @@ void offerCourse(Faculty faculty){
     return;
 }
 
-
-void printFaculty(Faculty current){
-    printf("| %s | %s | %s | %s | %s | %s | %s |\n",
-    current.first_name, current.last_name, current.faculty_id,
-    current.national_code, current.field, current.entrance_year,
-    current.section);
-}
-
-
-void facultySearch(FILE* file){
-    int opt;
-    char phrase[50];
-    Faculty current;
-    system("cls");
-    rewind(file);
-    printf("1. Search by first name\n");
-    printf("2. Search by last name\n");
-    printf("3. Search by faculty id\n");
-    printf("4. Search by national code\n");
-    printf("5. Search by field\n");
-    printf("6. Search by entrance year\n");
-    printf("7. Search by section\n");
-    printf("Enter an option: ");
-    scanf("%d", &opt);
-
-    printf("The phrase to search: ");
-    scanf("%s", phrase);
-
-    while(fread(&current, sizeof(Faculty), 1, file)){
-        switch(opt){
-            case 1:
-                if (strcmp(current.first_name, phrase) == 0) printFaculty(current);
-                break;
-            case 2:
-                if (strcmp(current.last_name, phrase) == 0) printFaculty(current);
-                break;
-            case 3:
-                if (strcmp(current.faculty_id, phrase) == 0) printFaculty(current);
-                break;
-            case 4:
-                if (strcmp(current.national_code, phrase) == 0) printFaculty(current);
-                break;
-            case 5:
-                if (strcmp(current.field, phrase) == 0) printFaculty(current);
-                break;
-            case 6:
-                if (strcmp(current.entrance_year, phrase) == 0) printFaculty(current);
-                break;
-            case 7:
-                if (strcmp(current.section, phrase) == 0) printFaculty(current);
-                break;
-        }
-    }
-    getchar();
-    getchar();
-    return;
-}
-
-
-void facultyList(){
-    int opt;
-    FILE* file = fopen("faculty.json", "rb");
-    Faculty current;
-    while(1){
-            system("cls");
-        printf("Faculty list\n");
-        printf("|first name |last name |faculty id |national code ");
-        printf("|field |entrance year | section|\n");
-        printf("|-----------|----------|-----------|--------------");
-        printf("|------|--------------|--------|\n");
-
-        rewind(file);
-        while(fread(&current, sizeof(Faculty), 1, file)) printFaculty(current);
-
-        printf("1. search\n2. go back\nEnter an option: ");
-        scanf("%d", &opt);
-
-        if (opt == 1) facultySearch(file);
-        else break;
-    }
-    fclose(file);
-}
-
-
-void registerFaculty(){
-    system("cls");
-    FILE* file = fopen("faculty.json", "ab");
-    int opt;
-    Faculty new_faculty;
-    printf("Register faculty(s)\n");
-    printf("1. Register one faculty\n");
-    printf("2. Register a group of faculties\n");
-    printf("Enter an option: ");
-    scanf("%d", &opt);
-    if (opt == 1){
-
-        printf("Enter first name: ");
-        scanf("%s", new_faculty.first_name);
-        printf("Enter last name: ");
-        scanf("%s", new_faculty.last_name);
-        printf("Enter faculty id: ");
-        scanf("%s", new_faculty.faculty_id);
-        printf("Enter national code: ");
-        scanf("%s", new_faculty.national_code);
-        printf("Enter field: ");
-        scanf("%s", new_faculty.field);
-        printf("Enter entrance year: ");
-        scanf("%s", new_faculty.entrance_year);
-        printf("Enter section: ");
-        scanf("%s", new_faculty.section);
-        printf("Enter password: ");
-        scanf("%s", new_faculty.password);
-
-        fwrite(&new_faculty, sizeof(Faculty), 1, file);
-        printf("Registered faculty successfully.\n");
-        printf("press any key to go back.");
-        getchar();
-        getchar();
-    } else {
-        char file_name[30];
-        printf("Enter file name: ");
-        scanf("%s", file_name);
-        FILE* imported_file = fopen(file_name, "rb");
-        if (imported_file == NULL) {
-                fclose(file);
-                printf("File not found.\n");
-                printf("press any key to go back.");
-                getchar();
-                getchar();
-                return;
-        }
-        while(fread(&new_faculty, sizeof(Faculty),1, imported_file)){
-            fwrite(&new_faculty, sizeof(Faculty), 1, file);
-        }
-        printf("Registered faculties successfully.\n");
-        printf("press any key to go back.");
-        fclose(imported_file);
-        getchar();
-        getchar();
-    }
-    fclose(file);
-}
-
-
-void removeFaculty(){
-    system("cls");
-    printf("Remove faculty\n");
-    printf("Enter username: ");
-
-    char username[ID_LEN];
-    scanf("%s", username);
-
-    FILE* file = fopen("faculty.json", "rb");
-    Faculty updated_list[10];
-    int count = 0, found = 0;
-
-    while(fread(&updated_list[count], sizeof(Faculty), 1, file)){
-        if(strcmp(updated_list[count].faculty_id, username) == 0){
-            printFaculty(updated_list[count]);
-            char input;
-            found = 1;
-            printf("Remove faculty?[y/n] ");
-            while(1){
-                scanf("%c", &input);
-                if (input == 'n') {fclose(file); return;}
-                else if (input == 'y') break;
-            }
-        } else count ++;
-    }
-    fclose(file);
-
-    if (found == 1){
-        FILE* file = fopen("faculty.json", "wb");
-        fwrite(updated_list, sizeof(Faculty), count, file);
-        printf("Faculty removed successfully.");
-        fclose(file);
-    }
-    else printf("User not found.");
-    getchar();
-    getchar();
-    return;
-}
-
-
 void searchMyOfferings(Faculty faculty){
     system("cls");
     int opt, num = 1, found = 0;
@@ -309,7 +124,6 @@ void searchMyOfferings(Faculty faculty){
     getchar();
     getchar();
 }
-
 
 void goToOffering(Faculty faculty){
     FILE* file = fopen("offerings.json", "rb");
@@ -385,7 +199,6 @@ void goToOffering(Faculty faculty){
     } else return;
 }
 
-
 void facultyMyOfferings(Faculty faculty){
 
     FILE* file = fopen("offerings.json", "rb");
@@ -422,3 +235,185 @@ void facultyMyOfferings(Faculty faculty){
         }
     }
 }
+
+
+
+void printFaculty(Faculty current){
+    printf("| %s | %s | %s | %s | %s | %s | %s |\n",
+    current.first_name, current.last_name, current.faculty_id,
+    current.national_code, current.field, current.entrance_year,
+    current.section);
+}
+
+void facultySearch(FILE* file){
+    int opt;
+    char phrase[50];
+    Faculty current;
+    system("cls");
+    rewind(file);
+    printf("1. Search by first name\n");
+    printf("2. Search by last name\n");
+    printf("3. Search by faculty id\n");
+    printf("4. Search by national code\n");
+    printf("5. Search by field\n");
+    printf("6. Search by entrance year\n");
+    printf("7. Search by section\n");
+    printf("Enter an option: ");
+    scanf("%d", &opt);
+
+    printf("The phrase to search: ");
+    scanf("%s", phrase);
+
+    while(fread(&current, sizeof(Faculty), 1, file)){
+        switch(opt){
+            case 1:
+                if (strcmp(current.first_name, phrase) == 0) printFaculty(current);
+                break;
+            case 2:
+                if (strcmp(current.last_name, phrase) == 0) printFaculty(current);
+                break;
+            case 3:
+                if (strcmp(current.faculty_id, phrase) == 0) printFaculty(current);
+                break;
+            case 4:
+                if (strcmp(current.national_code, phrase) == 0) printFaculty(current);
+                break;
+            case 5:
+                if (strcmp(current.field, phrase) == 0) printFaculty(current);
+                break;
+            case 6:
+                if (strcmp(current.entrance_year, phrase) == 0) printFaculty(current);
+                break;
+            case 7:
+                if (strcmp(current.section, phrase) == 0) printFaculty(current);
+                break;
+        }
+    }
+    getchar();
+    getchar();
+    return;
+}
+
+void facultyList(){
+    int opt;
+    FILE* file = fopen("faculty.json", "rb");
+    Faculty current;
+    while(1){
+            system("cls");
+        printf("Faculty list\n");
+        printf("|first name |last name |faculty id |national code ");
+        printf("|field |entrance year | section|\n");
+        printf("|-----------|----------|-----------|--------------");
+        printf("|------|--------------|--------|\n");
+
+        rewind(file);
+        while(fread(&current, sizeof(Faculty), 1, file)) printFaculty(current);
+
+        printf("1. search\n2. go back\nEnter an option: ");
+        scanf("%d", &opt);
+
+        if (opt == 1) facultySearch(file);
+        else break;
+    }
+    fclose(file);
+}
+
+void registerFaculty(){
+    system("cls");
+    FILE* file = fopen("faculty.json", "ab");
+    int opt;
+    Faculty new_faculty;
+    printf("Register faculty(s)\n");
+    printf("1. Register one faculty\n");
+    printf("2. Register a group of faculties\n");
+    printf("Enter an option: ");
+    scanf("%d", &opt);
+    if (opt == 1){
+
+        printf("Enter first name: ");
+        scanf("%s", new_faculty.first_name);
+        printf("Enter last name: ");
+        scanf("%s", new_faculty.last_name);
+        printf("Enter faculty id: ");
+        scanf("%s", new_faculty.faculty_id);
+        printf("Enter national code: ");
+        scanf("%s", new_faculty.national_code);
+        printf("Enter field: ");
+        scanf("%s", new_faculty.field);
+        printf("Enter entrance year: ");
+        scanf("%s", new_faculty.entrance_year);
+        printf("Enter section: ");
+        scanf("%s", new_faculty.section);
+        printf("Enter password: ");
+        scanf("%s", new_faculty.password);
+
+        fwrite(&new_faculty, sizeof(Faculty), 1, file);
+        printf("Registered faculty successfully.\n");
+        printf("press any key to go back.");
+        getchar();
+        getchar();
+    } else {
+        char file_name[30];
+        printf("Enter file name: ");
+        scanf("%s", file_name);
+        FILE* imported_file = fopen(file_name, "rb");
+        if (imported_file == NULL) {
+                fclose(file);
+                printf("File not found.\n");
+                printf("press any key to go back.");
+                getchar();
+                getchar();
+                return;
+        }
+        while(fread(&new_faculty, sizeof(Faculty),1, imported_file)){
+            fwrite(&new_faculty, sizeof(Faculty), 1, file);
+        }
+        printf("Registered faculties successfully.\n");
+        printf("press any key to go back.");
+        fclose(imported_file);
+        getchar();
+        getchar();
+    }
+    fclose(file);
+}
+
+void removeFaculty(){
+    system("cls");
+    printf("Remove faculty\n");
+    printf("Enter username: ");
+
+    char username[ID_LEN];
+    scanf("%s", username);
+
+    FILE* file = fopen("faculty.json", "rb");
+    Faculty updated_list[10];
+    int count = 0, found = 0;
+
+    while(fread(&updated_list[count], sizeof(Faculty), 1, file)){
+        if(strcmp(updated_list[count].faculty_id, username) == 0){
+            printFaculty(updated_list[count]);
+            char input;
+            found = 1;
+            printf("Remove faculty?[y/n] ");
+            while(1){
+                scanf("%c", &input);
+                if (input == 'n') {fclose(file); return;}
+                else if (input == 'y') break;
+            }
+        } else count ++;
+    }
+    fclose(file);
+
+    if (found == 1){
+        FILE* file = fopen("faculty.json", "wb");
+        fwrite(updated_list, sizeof(Faculty), count, file);
+        printf("Faculty removed successfully.");
+        fclose(file);
+    }
+    else printf("User not found.");
+    getchar();
+    getchar();
+    return;
+}
+
+
