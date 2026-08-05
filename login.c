@@ -231,7 +231,6 @@ void forgotPassword(){
                 printf("Confirm your password: ");
                 scanf("%s", confirm);
                 if (strcmp(new_password, confirm) == 0){
-                    Student current;
                     FILE* file = fopen("students.json", "rb+");
                     strcpy(current.password, new_password);
                     fseek(file, pos * sizeof(Student), SEEK_SET);
@@ -277,7 +276,9 @@ void loginPage(){
                 studentDashboard(pos);
                 break;
             case 2:
-                //facultyLogin();
+                pos = facultyLogin();
+                if (pos == -1) continue;
+                facultyDashboard(pos);
                 break;
             case 3:
                 adminLogin();

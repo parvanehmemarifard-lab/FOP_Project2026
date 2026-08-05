@@ -1,10 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "admin.h"
 #include "course.h"
+#include "student.h"
+#include "faculty.h"
+#include "offering.h"
 
 int calender[4] = {0, 0, 0, 0};
-Request requests[100];
+Request* requests[100];
+int request_count = 0;
 
 void adminCalender(){
     int opt;
@@ -54,16 +59,17 @@ void adminStudents(){
         printf("1. Student list\n2. Register student(s)\n");
         printf("3. Remove student(s)\n4. Go back\n");
         printf("Enter an option: ");
+
         scanf("%d", &opt);
         switch(opt){
             case 1:
-                //studentsList();
+                studentsList();
                 break;
             case 2:
-                //registerStudent();
+                registerStudent();
                 break;
             case 3:
-                //deleteStudent();
+                removeStudent();
                 break;
             case 4:
                 return;
@@ -71,11 +77,206 @@ void adminStudents(){
     }
 }
 
-void adminFaculty(){}
+void adminFaculty(){
+    int opt;
+    while(1){
+        system("cls");
+        printf("1. Faculty list\n2. Register Faculty(s)\n");
+        printf("3. Remove Faculty(s)\n4. Go back\n");
+        printf("Enter an option: ");
+        scanf("%d", &opt);
+        switch(opt){
+            case 1:
+                facultyList();
+                break;
+            case 2:
+                registerFaculty();
+                break;
+            case 3:
+                removeFaculty();
+                break;
+            case 4:
+                return;
+        }
+    }
+}
 
-void adminRequests(){}
+int addNewOffering(Offering offering){
+    FILE* file = fopen("offerings.json", "ab");
+    fwrite(&offering, sizeof(Offering), 1, file);
+    fclose(file);
+    return 1;
+}
 
-void adminOfferings(){}
+int removeOffering(Offering offering){
+    FILE* file = fopen("offerings.json", "rb");
+    Offering updated_list[10];
+    int count = 0, found = 0;
+
+    while(fread(&updated_list[count], sizeof(Offering), 1, file)){
+        if (updated_list[count].semester == offering.semester &&
+            strcmp(updated_list[count].course.course_id, offering.course.course_id) == 0 &&
+            strcmp(updated_list[count].faculty.faculty_id, offering.faculty.faculty_id) == 0) found = 1;
+        else count++;
+    }
+    fclose(file);
+
+    if (found == 1){
+        FILE* file = fopen("offerings.json", "wb");
+        fwrite(updated_list, sizeof(Offering), count, file);
+        printf("Offering removed successfully.");
+        getchar();
+        getchar();
+        fclose(file);
+        return 1;
+    }
+    else printf("Offering not found.");
+    getchar();
+    getchar();
+    return 0;
+}
+
+int increaseCapacity(Offering offering, int new_capacity){
+    FILE* file = fopen("offerings.json", "rb+");
+    Offering current;
+    int pos = 0, found = 0;
+    while(fread(&current, sizeof(Offering), 1, file)){
+        if (current.semester == offering.semester &&
+            strcmp(current.course.course_id, offering.course.course_id) == 0 &&
+            strcmp(current.faculty.faculty_id, offering.faculty.faculty_id) == 0){
+                found = 1;
+                break;
+        }
+        pos++;
+    }
+
+    if (found == 0){
+        printf("Offering not found.");
+        getchar();
+        getchar();
+        fclose(file);
+        return 0;
+    } else {
+        current.capacity = new_capacity;
+        fseek(file, pos * sizeof(Offering), SEEK_SET);
+        fwrite(&current, sizeof(Offering), 1, file);
+        fclose(file);
+        return 1;
+    }
+}
+
+void adminRequests(){
+    while(1){
+            system("cls");
+        printf("List of requests\n");
+        if (request_count == 0){printf("No requests."); getchar(); getchar(); return;}
+
+        for (int i = 0; i < request_count; i++){
+            if (requests[i]->type == 1){
+                printf("%d. course offering\n", (i+1));
+                printf("\tCourse: %s\n", requests[i]->offering.course.course_name);
+                printf("\tFaculty: %s\n", requests[i]->offering.faculty.faculty_id);
+                printf("\tDepartment: %s\n", requests[i]->offering.course.department);
+                printf("\tCapacity:  %d\n", requests[i]->offering.capacity);
+            } else if(requests[i]->type == 2){
+                printf("%d. course removing\n", (i+1));
+                printf("\tCourse: %s\n", requests[i]->offering.course.course_name);
+                printf("\tFaculty: %s\n", requests[i]->offering.faculty.faculty_id);
+                printf("\tDepartment: %s\n", requests[i]->offering.course.department);
+                printf("\tCapacity:  %d\n", requests[i]->offering.capacity);
+            } else {
+                printf("%d.  capacity increasement\n", (i+1));
+                printf("\tCourse: %s\n", requests[i]->offering.course.course_name);
+                printf("\tFaculty: %s\n", requests[i]->offering.faculty.faculty_id);
+                printf("\tDepartment: %s\n", requests[i]->offering.course.department);
+                printf("\tCapacity:  %d\n", requests[i]->new_capacity);
+                printf("\tNo. enrollments: %d\n", requests[i]->offering.enrollments);
+            }
+        }
+        printf("1. Go to request number\n");
+        printf("2. Go back\nEnter an option: ");
+        int opt;
+        scanf("%d", &opt);
+        if (opt == 2) return;
+
+        printf("Enter the request number: ");
+        int num;
+        scanf("%d", &num);
+        if (num > request_count) printf("Invalid number.");
+        else {
+            int done;
+            switch(requests[num-1]->type){
+                case 1:
+                    done = addNewOffering(requests[num-1]->offering);
+                    break;
+                case 2:
+                    done = removeOffering(requests[num-1]->offering);
+                    break;
+                case 3:
+                    done = increaseCapacity(requests[num-1]->offering, requests[num-1]->new_capacity);
+                    break;
+            }
+            if (done == 1){
+                for (int i = num - 1; i < request_count - 1; i++){
+                    requests[i] = requests[i + 1];
+                }
+                request_count--;
+            }
+        }
+    }
+}
+
+void adminOfferings(){
+    system("cls");
+    FILE* file = fopen("offerings.json", "rb");
+    Offering current;
+    int semester;
+    printf("Enter semester number: ");
+    scanf("%d", &semester);
+    while(1){
+        system("cls");
+        printf("Enter semester number: %d\n", semester);
+        rewind(file);
+        int opt, num = 0;
+
+        printf("List of offerings - %d\n", semester);
+        printf("| number | course name | course id | faculty id | semester");
+        printf(" | capacity | no. enrollments | department | place |\n");
+        printf("|--------|-------------|-----------|------------|----------|");
+        printf("----------|-----------------|------------|-------|\n");
+
+        while(fread(&current, sizeof(Offering), 1, file)){
+            if (current.semester == semester) printOfferingAdmin(current, ++num);
+        }
+
+        printf("1. Search\n");
+        printf("2. Add student to an offering\n");
+        printf("3. Remove student from an offering\n");
+        printf("4. Go back\n");
+        printf("Enter an option: ");
+        scanf("%d", &opt);
+
+        if (opt == 1) searchOffering(semester);
+        else if (opt == 4) {fclose(file); return;}
+        else {
+            int input, found = 0;
+            num = 1;
+            printf("Enter number of offering: ");
+            scanf("%d", &input);
+            rewind(file);
+            while(fread(&current, sizeof(Offering), 1, file)){
+                if (current.semester == semester){
+                    if (num == input) {found = 1; break;}
+                    num++;
+                }
+            }
+
+            if (found == 0) {printf("Offering not found."); getchar(); getchar();}
+            else if (opt == 2) addStudentToOffering(current);
+            else removeStudentFromOffering(current);
+        }
+    }
+}
 
 void adminDashboard(){
     int opt;
@@ -111,3 +312,5 @@ void adminDashboard(){
         }
     }
 }
+
+

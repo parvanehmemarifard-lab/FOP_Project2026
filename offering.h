@@ -2,7 +2,7 @@
 #define OFFERING_H
 #include "course.h"
 #include "faculty.h"
-//#include "faculty.h"
+
 
 typedef struct{
 	Course course;
@@ -15,5 +15,14 @@ typedef struct{
 
 void printOfferingAdmin(Offering current, int num);
 void printOfferingStudent(Offering current, int num);
+
+void searchOffering(int semester);
+
+void addStudentToOffering(Offering offering);
+void removeStudentFromOffering(Offering offering);
+
+void recordGrades(Offering offering);
+
+
 
 #endif // OFFERING_H
