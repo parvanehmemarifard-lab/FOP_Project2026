@@ -180,10 +180,14 @@ void removeCourse(){
     char id[ID_LEN];
     scanf("%s", id);
 
+    int count = 0;
+    Course temp;
     FILE* file = fopen("courses.json", "rb");
-    Course updated_list[10];
-    int count = 0, found = 0;
-
+    while(fread(&temp, sizeof(Course), 1, file)) count++;
+    Course* updated_list = malloc(sizeof(Course) * count);
+    int found = 0;
+    rewind(file);
+    count = 0;
     while(fread(&updated_list[count], sizeof(Course), 1, file)){
         if(strcmp(updated_list[count].course_id, id) == 0){
             printCourse(updated_list[count]);
@@ -208,5 +212,6 @@ void removeCourse(){
     else printf("Course not found.");
     getchar();
     getchar();
+    free(updated_list);
     return;
 }

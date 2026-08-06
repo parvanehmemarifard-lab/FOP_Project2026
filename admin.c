@@ -188,6 +188,7 @@ void adminOfferings(){
             else removeStudentFromOffering(current);
         }
     }
+    fclose(file);
 }
 
 
@@ -200,10 +201,14 @@ int addNewOffering(Offering offering){
 }
 
 int removeOffering(Offering offering){
+    Offering temp;
     FILE* file = fopen("offerings.json", "rb");
-    Offering updated_list[10];
-    int count = 0, found = 0;
-
+    int count = 0;
+    while(fread(&temp, sizeof(Offering), 1, file)) count++;
+    Offering* updated_list = malloc(sizeof(Offering) * count);
+    int found = 0;
+    count = 0;
+    rewind(file);
     while(fread(&updated_list[count], sizeof(Offering), 1, file)){
         if (updated_list[count].semester == offering.semester &&
             strcmp(updated_list[count].course.course_id, offering.course.course_id) == 0 &&
@@ -218,10 +223,12 @@ int removeOffering(Offering offering){
         printf("Offering removed successfully.");
         getchar();
         getchar();
+        free(updated_list);
         fclose(file);
         return 1;
     }
     else printf("Offering not found.");
+    free(updated_list);
     getchar();
     getchar();
     return 0;
