@@ -77,7 +77,7 @@ void enrollCourse(Student *student, int semester, int pos){
     while(fread(&current, sizeof(Offering), 1, fileOfferigs)){
         if (semester == current.semester){
             if (num == input){
-                printOfferingStudent(current, num);
+                printOfferingGeneral(current, num);
                 found = 1;
                 break;
             }
@@ -141,7 +141,7 @@ void withdrawCourse(Student *student, int semester, int pos){
     while(fread(&current, sizeof(Offering), 1, fileOfferigs)){
         if (semester == current.semester){
             if (num == input){
-                printOfferingStudent(current, num);
+                printOfferingGeneral(current, num);
                 found = 1;
                 break;
             }
@@ -209,7 +209,7 @@ void offeringListStudent(Student student, int pos){
         system("cls");
         rewind(file);
         num = 0;
-        printf("Enter semester number: %d", semester);
+        printf("Enter semester number: %d\n", semester);
 
         printf("List of offerings - %d\n| number | ", semester);
         printf("course name | course id | faculty name | semester | ");
@@ -218,9 +218,8 @@ void offeringListStudent(Student student, int pos){
         while(fread(&current, sizeof(Offering), 1, file)){
             if (current.semester == semester &&
                 passedPrerequisities(student, current.course))
-                    printOfferingStudent(current, ++num);
+                    printOfferingGeneral(current, ++num);
         }
-        fclose(file);
         printf("1. Search\n2. Enroll in course\n");
         printf("3. Withdraw course\n4. Go back\n");
         printf("Enter an option: ");
@@ -315,7 +314,7 @@ void printStudent(Student current){
 }
 
 void studentsSearch(FILE* file){
-    int opt;
+    int opt, found = 0;
     char phrase[50];
     Student current;
     system("cls");
@@ -338,34 +337,35 @@ void studentsSearch(FILE* file){
     while(fread(&current, sizeof(Student), 1, file)){
         switch(opt){
             case 1:
-                if (strcmp(current.first_name, phrase) == 0) printStudent(current);
+                if (strcmp(current.first_name, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 2:
-                if (strcmp(current.last_name, phrase) == 0) printStudent(current);
+                if (strcmp(current.last_name, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 3:
-                if (strcmp(current.student_id, phrase) == 0) printStudent(current);
+                if (strcmp(current.student_id, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 4:
-                if (strcmp(current.national_code, phrase) == 0) printStudent(current);
+                if (strcmp(current.national_code, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 5:
-                if (strcmp(current.field, phrase) == 0) printStudent(current);
+                if (strcmp(current.field, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 6:
-                if (strcmp(current.entrance_year, phrase) == 0) printStudent(current);
+                if (strcmp(current.entrance_year, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 7:
-                if (strcmp(current.section, phrase) == 0) printStudent(current);
+                if (strcmp(current.section, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 8:
-                if (strcmp(current.mentor, phrase) == 0) printStudent(current);
+                if (strcmp(current.mentor, phrase) == 0) {printStudent(current); found = 1;}
                 break;
             case 9:
-                if (strcmp(current.department, phrase) == 0) printStudent(current);
+                if (strcmp(current.department, phrase) == 0) {printStudent(current); found = 1;}
                 break;
         }
     }
+    if (found == 0) printf("No students found.");
     getchar();
     getchar();
     return;
@@ -474,8 +474,14 @@ void removeStudent(){
     scanf("%s", username);
 
     FILE* file = fopen("students.json", "rb");
-    Student updated_list[10];
-    int count = 0, found = 0;
+    int count = 0;
+    Student temp;
+    while(fread(&temp, sizeof(Student), 1, file)) count++;
+
+    Student* updated_list = malloc(sizeof(Student) * count);
+    int found = 0;
+    count = 0;
+    rewind(file);
 
     while(fread(&updated_list[count], sizeof(Student), 1, file)){
         if(strcmp(updated_list[count].student_id, username) == 0){
@@ -501,5 +507,6 @@ void removeStudent(){
     else printf("User not found.");
     getchar();
     getchar();
+    free(updated_list);
     return;
 }

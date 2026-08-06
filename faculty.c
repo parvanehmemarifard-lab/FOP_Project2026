@@ -28,7 +28,7 @@ void facultyDashboard(int pos){
                 facultyMyOfferings(faculty);
                 break;
             case 2:
-                searchOffering(-1);
+                offeringListFaculty();
                 break;
             case 3:
                 coursesListGeneral();
@@ -236,6 +236,36 @@ void facultyMyOfferings(Faculty faculty){
     }
 }
 
+void offeringListFaculty(){
+    FILE* file = fopen("offerings.json", "rb");
+    Offering current;
+    int semester, option, num = 0;
+    system("cls");
+    printf("Enter semester number: ");
+    scanf("%d", &semester);
+    while(1){
+        system("cls");
+        rewind(file);
+        num = 0;
+        printf("Enter semester number: %d\n", semester);
+
+        printf("List of offerings - %d\n| number | ", semester);
+        printf("course name | course id | faculty name | semester | ");
+        printf("capacity | no.enrollments | department | place |\n");
+
+        while(fread(&current, sizeof(Offering), 1, file)){
+            if (current.semester == semester)
+                printOfferingGeneral(current, ++num);
+        }
+
+        printf("1. Search\n2. Go back\n");
+        printf("Enter an option: ");
+        scanf("%d", &option);
+        if (option == 1) searchOffering(semester);
+        else break;
+    }
+    fclose(file);
+}
 
 
 void printFaculty(Faculty current){
@@ -246,7 +276,7 @@ void printFaculty(Faculty current){
 }
 
 void facultySearch(FILE* file){
-    int opt;
+    int opt, found = 0;
     char phrase[50];
     Faculty current;
     system("cls");
@@ -289,6 +319,7 @@ void facultySearch(FILE* file){
                 break;
         }
     }
+    if (found == 0) printf("No faculties found.");
     getchar();
     getchar();
     return;
@@ -385,10 +416,15 @@ void removeFaculty(){
     char username[ID_LEN];
     scanf("%s", username);
 
+    int count = 0;
+    Faculty temp;
     FILE* file = fopen("faculty.json", "rb");
-    Faculty updated_list[10];
-    int count = 0, found = 0;
+    while(fread(&temp, sizeof(Faculty), 1, file)) count++;
 
+    Faculty* updated_list = malloc(sizeof(Faculty) * count);
+    int found = 0;
+    count = 0;
+    rewind(file);
     while(fread(&updated_list[count], sizeof(Faculty), 1, file)){
         if(strcmp(updated_list[count].faculty_id, username) == 0){
             printFaculty(updated_list[count]);
@@ -413,7 +449,6 @@ void removeFaculty(){
     else printf("User not found.");
     getchar();
     getchar();
+    free(updated_list);
     return;
 }
-
-

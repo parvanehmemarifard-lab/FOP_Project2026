@@ -18,6 +18,7 @@ void facultyDashboard(int pos);
 void facultyMyOfferings(Faculty faculty);
 void searchMyOfferings(Faculty faculty);
 void goToOffering(Faculty faculty);
+void offeringListFaculty();
 
 void offerCourse(Faculty faculty);
 

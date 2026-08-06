@@ -4,7 +4,7 @@
 #include "offering.h"
 #include "student.h"
 
-void printOfferingStudent(Offering current, int num){
+void printOfferingGeneral(Offering current, int num){
     printf("|%d| %s | %s | ", num, current.course.course_name, current.course.course_id);
     printf("%s %s | ", current.faculty.first_name, current.faculty.last_name);
     printf("%d | %d | %d | ", current.semester, current.capacity, current.enrollments);
@@ -20,10 +20,7 @@ void printOfferingAdmin(Offering current, int num){
 
 void searchOffering(int semester){
     system("cls");
-    if (semester == -1){
-        printf("Enter semester: ");
-        scanf("%d", &semester);
-    }
+
     int opt, num = 1, found = 0;
     char phrase[50];
 
@@ -36,9 +33,9 @@ void searchOffering(int semester){
     printf("Enter the phrase: ");
     scanf("%s", phrase);
 
-    FILE* file = fopen("offerings.json", "rb");
+    FILE* fPtr = fopen("offerings.json", "rb");
     Offering current;
-    while(fread(&current, sizeof(Offering), 1, file)){
+    while(fread(&current, sizeof(Offering), 1, fPtr)){
         if (semester != current.semester) continue;
         switch(opt){
             case 1:
@@ -56,7 +53,7 @@ void searchOffering(int semester){
         }
     }
     if (found == 0) printf("No offerings found.");
-    fclose(file);
+    fclose(fPtr);
     getchar();
     getchar();
 }

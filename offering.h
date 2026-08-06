@@ -14,7 +14,7 @@ typedef struct{
 } Offering;
 
 void printOfferingAdmin(Offering current, int num);
-void printOfferingStudent(Offering current, int num);
+void printOfferingGeneral(Offering current, int num);
 
 void searchOffering(int semester);
 
